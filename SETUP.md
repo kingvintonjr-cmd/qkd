@@ -28,7 +28,7 @@ simulaqron start --nodes nodes.json
 
 ## 2. Running the Simulation
 
-Start the processes in the following order:
+Start the processes in the following order. **Note:** Bob and Eve must be running and ready to receive before Alice starts sending.
 
 1. **On the Bob VM (192.168.56.13):**
    ```bash
@@ -44,6 +44,15 @@ Start the processes in the following order:
    ```bash
    python3 alice.py
    ```
+
+## 4. Troubleshooting "Code Not Running"
+
+If you encounter errors or the scripts hang:
+
+1. **Check SimulaQron Backend**: Ensure the SimulaQron backend is running on all VMs. You can start it with `simulaqron start`.
+2. **Connectivity**: Verify that VMs can ping each other. Alice must be able to reach Eve, and Eve must be able to reach Bob.
+3. **Reset Backend**: If a previous run crashed, try `simulaqron stop` then `simulaqron start` on all nodes to clear the state.
+4. **Firewall**: Ensure ports `8801` (CQC) and `8802` (Virtual Node) are open on your private network.
 
 ## 3. Verify Output
 - **Alice** and **Bob** will output their sifted key size and the calculated QBER.

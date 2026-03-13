@@ -1,65 +1,78 @@
 import random
+import time
 from cqc.pythonLib import CQCConnection, qubit
 
 def main():
     # Initialize the connection
-    with CQCConnection("Alice") as Alice:
-        num_bits = 100
-        bits = [random.randint(0, 1) for _ in range(num_bits)]
-        bases = [random.randint(0, 1) for _ in range(num_bits)]
+    # We use a try-except block to help diagnose connection issues
+    try:
+        with CQCConnection("Alice") as Alice:
+            num_bits = 100
+            bits = [random.randint(0, 1) for _ in range(num_bits)]
+            bases = [random.randint(0, 1) for _ in range(num_bits)]
 
-        print(f"Alice: Generated {num_bits} bits and bases.")
+            print(f"Alice: Generated {num_bits} bits and bases.")
+            print("Alice: Waiting 5 seconds for Bob and Eve to be ready...")
+            time.sleep(5)
 
-        # Send qubits to Eve
-        for i in range(num_bits):
-            q = qubit(Alice)
-            if bits[i] == 1:
-                q.X()
-            if bases[i] == 1:
-                q.H()
+            # Send qubits to Eve
+            for i in range(num_bits):
+                q = qubit(Alice)
+                if bits[i] == 1:
+                    q.X()
+                if bases[i] == 1:
+                    q.H()
 
-            # Alice sends to Eve
-            Alice.sendQubit(q, "Eve")
+                # Alice sends to Eve
+                Alice.sendQubit(q, "Eve")
+                # Small delay to avoid overwhelming the backend
+                time.sleep(0.01)
 
-        print("Alice: Sent all qubits to Eve.")
+            print("Alice: Sent all qubits to Eve.")
 
-        # Basis reconciliation: Alice sends her bases to Bob
-        # We need to send them as a list of bytes/integers
-        Alice.sendClassical("Bob", bases)
-        print("Alice: Sent bases to Bob.")
+            # Wait a bit to ensure Bob has finished receiving and is ready for classical communication
+            print("Alice: Waiting for Bob to finish measurements...")
+            time.sleep(5)
 
-        # Receive Bob's matching indices
-        # match_indices will be a list of indices where bases matched
-        match_indices = list(Alice.recvClassical())
-        print(f"Alice: Received {len(match_indices)} matching indices from Bob.")
+            # Basis reconciliation: Alice sends her bases to Bob
+            print("Alice: Sending bases to Bob...")
+            Alice.sendClassical("Bob", bases)
 
-        sifted_key = [bits[i] for i in match_indices]
+            # Receive Bob's matching indices
+            print("Alice: Waiting for matching indices from Bob...")
+            msg = Alice.recvClassical()
+            match_indices = list(msg)
+            print(f"Alice: Received {len(match_indices)} matching indices from Bob.")
 
-        # QBER Estimation: Alice sends the first half of the sifted key to Bob
-        # to compare and estimate error rate.
-        num_reveal = len(sifted_key) // 2
-        reveal_indices = match_indices[:num_reveal]
-        reveal_values = sifted_key[:num_reveal]
+            sifted_key = [bits[i] for i in match_indices]
 
-        # Send revealed values to Bob
-        Alice.sendClassical("Bob", reveal_values)
-        print(f"Alice: Sent {num_reveal} revealed bits to Bob for QBER estimation.")
+            # QBER Estimation: Alice sends the first half of the sifted key to Bob
+            num_reveal = len(sifted_key) // 2
+            reveal_values = sifted_key[:num_reveal]
 
-        # Receive QBER and decision from Bob
-        data = list(Alice.recvClassical())
-        qber = data[0] / 100.0
-        decision = data[1] # 1 for OK, 0 for Abort
+            print(f"Alice: Sending {num_reveal} revealed bits to Bob...")
+            Alice.sendClassical("Bob", reveal_values)
 
-        final_key = sifted_key[num_reveal:]
+            # Receive QBER and decision from Bob
+            print("Alice: Waiting for QBER and decision from Bob...")
+            res_msg = Alice.recvClassical()
+            data = list(res_msg)
+            qber = data[0] / 100.0
+            decision = data[1] # 1 for OK, 0 for Abort
 
-        print("\n--- Alice Results ---")
-        print(f"Sifted Key Size: {len(sifted_key)}")
-        print(f"QBER: {qber:.2%}")
-        if decision == 1:
-            print(f"Final Key Agreement Status: SUCCESS")
-            print(f"Final Key: {final_key}")
-        else:
-            print(f"Final Key Agreement Status: ABORTED (QBER > 11%)")
+            final_key = sifted_key[num_reveal:]
+
+            print("\n--- Alice Results ---")
+            print(f"Sifted Key Size: {len(sifted_key)}")
+            print(f"QBER: {qber:.2%}")
+            if decision == 1:
+                print(f"Final Key Agreement Status: SUCCESS")
+                print(f"Final Key: {final_key}")
+            else:
+                print(f"Final Key Agreement Status: ABORTED (QBER > 11%)")
+
+    except Exception as e:
+        print(f"Alice Error: {e}")
 
 if __name__ == "__main__":
     main()
