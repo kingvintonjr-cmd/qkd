@@ -2,6 +2,10 @@
 
 To run this simulation across your three virtual machines, follow these steps to configure SimulaQron with the provided `nodes.json`.
 
+## 0. File Distribution
+
+Copy all project files (`alice.py`, `bob.py`, `eve.py`, `nodes.json`) to the same directory on **all three virtual machines**. This ensures that each node has access to the network configuration and its respective protocol script.
+
 ## 1. Configure SimulaQron on each VM
 
 On each of the three VMs (Alice, Eve, Bob), you need to tell SimulaQron about the network topology.
