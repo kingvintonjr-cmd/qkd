@@ -6,16 +6,16 @@ def main():
     # Initialize the connection
     # We use a try-except block to help diagnose connection issues
     try:
-        with CQCConnection("Alice") as Alice:
+        with CQCConnection("alice") as Alice:
             num_bits = 100
             bits = [random.randint(0, 1) for _ in range(num_bits)]
             bases = [random.randint(0, 1) for _ in range(num_bits)]
 
             print(f"Alice: Generated {num_bits} bits and bases.")
-            print("Alice: Waiting 5 seconds for Bob and Eve to be ready...")
+            print("Alice: Waiting 5 seconds for bob and eve to be ready...")
             time.sleep(5)
 
-            # Send qubits to Eve
+            # Send qubits to eve
             for i in range(num_bits):
                 q = qubit(Alice)
                 if bits[i] == 1:
@@ -23,38 +23,38 @@ def main():
                 if bases[i] == 1:
                     q.H()
 
-                # Alice sends to Eve
-                Alice.sendQubit(q, "Eve")
+                # Alice sends to eve
+                Alice.sendQubit(q, "eve")
                 # Small delay to avoid overwhelming the backend
                 time.sleep(0.01)
 
-            print("Alice: Sent all qubits to Eve.")
+            print("Alice: Sent all qubits to eve.")
 
-            # Wait a bit to ensure Bob has finished receiving and is ready for classical communication
-            print("Alice: Waiting for Bob to finish measurements...")
+            # Wait a bit to ensure bob has finished receiving and is ready for classical communication
+            print("Alice: Waiting for bob to finish measurements...")
             time.sleep(5)
 
-            # Basis reconciliation: Alice sends her bases to Bob
-            print("Alice: Sending bases to Bob...")
-            Alice.sendClassical("Bob", bases)
+            # Basis reconciliation: Alice sends her bases to bob
+            print("Alice: Sending bases to bob...")
+            Alice.sendClassical("bob", bases)
 
-            # Receive Bob's matching indices
-            print("Alice: Waiting for matching indices from Bob...")
+            # Receive bob's matching indices
+            print("Alice: Waiting for matching indices from bob...")
             msg = Alice.recvClassical()
             match_indices = list(msg)
-            print(f"Alice: Received {len(match_indices)} matching indices from Bob.")
+            print(f"Alice: Received {len(match_indices)} matching indices from bob.")
 
             sifted_key = [bits[i] for i in match_indices]
 
-            # QBER Estimation: Alice sends the first half of the sifted key to Bob
+            # QBER Estimation: Alice sends the first half of the sifted key to bob
             num_reveal = len(sifted_key) // 2
             reveal_values = sifted_key[:num_reveal]
 
-            print(f"Alice: Sending {num_reveal} revealed bits to Bob...")
-            Alice.sendClassical("Bob", reveal_values)
+            print(f"Alice: Sending {num_reveal} revealed bits to bob...")
+            Alice.sendClassical("bob", reveal_values)
 
-            # Receive QBER and decision from Bob
-            print("Alice: Waiting for QBER and decision from Bob...")
+            # Receive QBER and decision from bob
+            print("Alice: Waiting for QBER and decision from bob...")
             res_msg = Alice.recvClassical()
             data = list(res_msg)
             qber = data[0] / 100.0

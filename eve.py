@@ -5,7 +5,7 @@ from cqc.pythonLib import CQCConnection, qubit
 def main():
     # Initialize the connection
     try:
-        with CQCConnection("Eve") as Eve:
+        with CQCConnection("eve") as Eve:
             num_bits = 100
 
             print(f"Eve: Ready to intercept {num_bits} qubits.")
@@ -33,11 +33,11 @@ def main():
                     if basis == 1:
                         q_resend.H()
 
-                    # Send to Bob
-                    Eve.sendQubit(q_resend, "Bob")
+                    # Send to bob
+                    Eve.sendQubit(q_resend, "bob")
                 else:
                     # Just forward the qubit without measurement
-                    Eve.sendQubit(q, "Bob")
+                    Eve.sendQubit(q, "bob")
 
             print(f"Eve: Intercepted and measured {intercept_count} qubits.")
             print("Eve: Forwarded all qubits to Bob.")

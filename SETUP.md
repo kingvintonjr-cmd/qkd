@@ -14,9 +14,9 @@ On each of the three VMs (Alice, Eve, Bob), you need to tell SimulaQron about th
 Run the following commands on **all** VMs to ensure they all share the same network map:
 
 ```bash
-simulaqron nodes add Alice --hostname 192.168.56.11
-simulaqron nodes add Eve --hostname 192.168.56.12
-simulaqron nodes add Bob --hostname 192.168.56.13
+simulaqron nodes add alice --hostname 192.168.56.11
+simulaqron nodes add eve --hostname 192.168.56.12
+simulaqron nodes add bob --hostname 192.168.56.13
 ```
 
 ### Option B: Using the `nodes.json` file
@@ -50,7 +50,7 @@ Start the processes in the following order. **Note:** Bob and Eve must be runnin
 If you encounter errors or the scripts hang:
 
 1. **Check SimulaQron Backend**: Ensure the SimulaQron backend is running on all VMs. You can start it with `simulaqron start`.
-2. **Connectivity**: Verify that VMs can ping each other. Alice must be able to reach Eve, and Eve must be able to reach Bob.
+2. Connectivity: Verify that VMs can ping each other. alice must be able to reach eve, and eve must be able to reach bob.
 3. **Reset Backend**: If a previous run crashed, try `simulaqron stop` then `simulaqron start` on all nodes to clear the state.
 4. **Firewall**: Ensure ports `8801` (CQC) and `8802` (Virtual Node) are open on your private network.
 

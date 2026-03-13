@@ -5,7 +5,7 @@ from cqc.pythonLib import CQCConnection, qubit
 def main():
     # Initialize the connection
     try:
-        with CQCConnection("Bob") as Bob:
+        with CQCConnection("bob") as Bob:
             num_bits = 100
             bases = [random.randint(0, 1) for _ in range(num_bits)]
             results = []
@@ -35,14 +35,14 @@ def main():
             match_indices = [i for i in range(num_bits) if bases[i] == alice_bases[i]]
             print(f"Bob: Found {len(match_indices)} matching bases.")
 
-            # Send match indices to Alice
-            print("Bob: Sending matching indices to Alice...")
-            Bob.sendClassical("Alice", match_indices)
+            # Send match indices to alice
+            print("Bob: Sending matching indices to alice...")
+            Bob.sendClassical("alice", match_indices)
 
             sifted_key = [results[i] for i in match_indices]
 
-            # QBER Estimation: Receive revealed bits from Alice
-            print("Bob: Waiting for revealed bits from Alice...")
+            # QBER Estimation: Receive revealed bits from alice
+            print("Bob: Waiting for revealed bits from alice...")
             msg_reveal = Bob.recvClassical()
             alice_reveal_values = list(msg_reveal)
             num_reveal = len(alice_reveal_values)
@@ -57,9 +57,9 @@ def main():
             qber = errors / num_reveal if num_reveal > 0 else 0
             decision = 1 if qber <= 0.11 else 0
 
-            # Send QBER result and decision back to Alice
-            print(f"Bob: Sending QBER ({qber:.2%}) and decision to Alice...")
-            Bob.sendClassical("Alice", [int(qber * 100), decision])
+            # Send QBER result and decision back to alice
+            print(f"Bob: Sending QBER ({qber:.2%}) and decision to alice...")
+            Bob.sendClassical("alice", [int(qber * 100), decision])
 
             final_key = sifted_key[num_reveal:]
 
