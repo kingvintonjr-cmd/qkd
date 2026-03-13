@@ -14,9 +14,9 @@ On each of the three VMs (Alice, Eve, Bob), you need to tell SimulaQron about th
 Run the following commands on **all** VMs to ensure they all share the same network map:
 
 ```bash
-simulaqron nodes add --name Alice --ip 192.168.56.11
-simulaqron nodes add --name Eve --ip 192.168.56.12
-simulaqron nodes add --name Bob --ip 192.168.56.13
+simulaqron nodes add Alice --hostname 192.168.56.11
+simulaqron nodes add Eve --hostname 192.168.56.12
+simulaqron nodes add Bob --hostname 192.168.56.13
 ```
 
 ### Option B: Using the `nodes.json` file
